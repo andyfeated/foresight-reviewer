@@ -1,7 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
-import { createProxyMiddleware } from 'http-proxy-middleware'
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 import reviewRoutes from './routes/reviewRoutes'
 
 const app = express()
@@ -22,6 +22,9 @@ app.use('/api/gitlab', createProxyMiddleware({
   changeOrigin: true,
   pathRewrite: {
     '^/api/gitlab': ''
+  },
+  on: {
+    proxyReq: fixRequestBody
   }
 }))
 

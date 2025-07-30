@@ -12,12 +12,12 @@ export class ReviewService {
 
       const responseStatus = pullRequestResponse.status
 
-      if (responseStatus === 403) {
-        // private
-      } else if (responseStatus === 200) {
+      console.log(responseStatus)
+
+      if (responseStatus === 200) {
         // public
-      } else {
-        // fallback
+      } else if (responseStatus === 403) {
+        // private or doesnt exists
       }
       
       return { success: true }
