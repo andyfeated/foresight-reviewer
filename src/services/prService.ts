@@ -10,7 +10,7 @@ export class PrService {
   }
 
   private extractProjectId(url: string) {
-    // https://gitlab.com/alougovs/useful-gemini/-/merge_requests/1
+    // https://gitlab.com/user/project/-/merge_requests/1
     const gitlabBaseUrl = 'https://gitlab.com/'
     const trimmedUrl = url.replace(gitlabBaseUrl, '')
 
