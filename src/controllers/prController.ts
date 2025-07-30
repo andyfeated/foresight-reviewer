@@ -43,7 +43,7 @@ export class PrController {
     }
 
     try {
-      const pullRequestResponse = await this.prService.pullRequest(pullRequestUrl)
+      const pullRequestResponse = await this.prService.pullRequest({ pullRequestUrl })
 
       res.status(201).json(pullRequestResponse)
     } catch (err: any) {
