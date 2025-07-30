@@ -5,6 +5,6 @@ const router = express.Router()
 
 const prController: PrController = new PrController()
 
-router.get('/', prController.pullRequest.bind(prController))
+router.post('/', prController.pullRequest.bind(prController))
 
 export default router
