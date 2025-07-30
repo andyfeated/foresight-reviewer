@@ -28,16 +28,13 @@ export class PrController {
   }
 
   public async pullRequest(req: Request, res: Response) {
-    console.log('abc')
     const parseResult = PullRequestPayloadSchema.safeParse(req.body)
 
-    console.log('here1')
     if (!parseResult.success) {
       return res.status(400).json({ 
         error: 'Invalid Input', details: parseResult.error 
       })
     }
-    console.log('here2')
 
     const { pullRequestUrl } = req.body
 
