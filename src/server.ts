@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 import reviewRoutes from './routes/reviewRoutes'
+import authRoutes from './routes/authRoutes'
 
 const app = express()
 
@@ -16,6 +17,7 @@ app.get('/health', async (req, res) => {
 })
 
 app.use('/api/review', reviewRoutes)
+app.use('/api/auth', authRoutes)
 
 app.use('/api/gitlab', createProxyMiddleware({
   target: process.env.GITLAB_SERVICE_URL,

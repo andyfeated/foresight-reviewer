@@ -1,3 +1,5 @@
+import { AuthService } from "./authService";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ReviewPullRequestPayload {
   pullRequestUrl: string;
@@ -5,9 +7,11 @@ interface ReviewPullRequestPayload {
 
 export class ReviewService {
   private gitlabServiceBaseUrl: string;
+  private authService: AuthService;
 
   constructor() {
     this.gitlabServiceBaseUrl = process.env.GITLAB_SERVICE_URL as string;
+    this.authService = new AuthService()
   }
   
   public async reviewPullRequest(payload: ReviewPullRequestPayload) {
@@ -23,16 +27,25 @@ export class ReviewService {
       const pullRequestData = await pullRequestResponse.json()
 
       const pullRequestStatus = pullRequestData.status
-
      
-      console.log(pullRequestData.status)
       if (pullRequestStatus === 200) {
-        console.log('public repo')
+        return {
+          authRequired: false
+        }
       } else if (pullRequestStatus === 404) {
-        console.log('private repo or does not exist')
+        const payload = { prUrl: pullRequestUrl }
+
+        const oauthUrl = this.authService.buildGitlabOAuthUrl(payload)
+        
+        return {
+          authRequired: true,
+          oauthUrl
+        }
+      } else {
+        return {
+          error: 'Unkown status code'
+        }
       }
-      
-      return { success: true }
     } catch (err: any) {
       throw new Error(err.message)
     }
