@@ -1,19 +1,58 @@
 import { ArrowRightIcon, Github, Gitlab, SearchCode } from 'lucide-react'
 import { useState } from 'react'
+import axios from 'axios'
 
 const MainForm: React.FC = () => {
   const [prUrl, setPrUrl] = useState('')
   const [error, setError] = useState('')
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
+
+    const isGitlabPR = prUrl.includes('gitlab.com') && prUrl.includes('/merge_requests')
+    const isGithubPR = prUrl.includes('github.com') && prUrl.includes('/pull')
 
     if (!prUrl.trim()) {
       setError('Please enter a PR URL')
       return
     }
 
-    setError('')
+    if (!isGitlabPR && !isGithubPR) {
+      setError('Please enter a valid Github or Gitlab PR URL')
+      return
+    }
+
+    const payload = {
+      pullRequestUrl: prUrl
+    }
+
+    try {
+      const reviewUrl = `${import.meta.env.VITE_API_GATEWAY_BASE_URL}/api/review`
+      
+      const res = await axios.post(reviewUrl, payload)
+      
+      const data = res.data
+
+      if (!data.authRequired) {
+
+      } else {
+        window.open(data.oauthUrl, '_blank', 'width=500,height=600')
+
+        const handleMessage = async (event: MessageEvent) => {
+          if (event.origin !== import.meta.env.VITE_API_GATEWAY_BASE_URL) return;
+
+          const data = event.data
+          console.log(data)
+          
+          window.removeEventListener('message', handleMessage)
+        }
+
+        window.addEventListener('message', handleMessage)
+      }
+    } catch (err: any) {
+      setError(err.response.data.error)
+    }
   }
   
   return (
