@@ -11,6 +11,7 @@ export class AuthController {
 
   public async gitlabCallbackHandler(req: Request, res: Response) {
     const { code, state } = req.query
+    console.log('code and state', code, state)
 
     try {
       const token = await this.authService.exchangeCodeForToken(code as string)
@@ -18,9 +19,13 @@ export class AuthController {
 
       const postMessageHtml = this.authService.buildPostMessageHtml(token, decodedState.prUrl)
 
-      res.send(postMessageHtml)
+      res.status(200).send(postMessageHtml)
     } catch(err: any) {
-      res.status(400).json({ error: err.message })
+      const postMessageHtml = this.authService.buildPostMessageHtml(null, null, false)
+
+      console.log('Failed to get access token', err.message)
+
+      res.status(400).send(postMessageHtml)
     }
   }
 }

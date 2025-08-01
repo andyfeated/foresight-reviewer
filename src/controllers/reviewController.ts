@@ -29,7 +29,7 @@ export class ReviewController {
     }
   }
 
-  public async reviewPullRequest(req: Request, res: Response) {
+  public async checkAccess(req: Request, res: Response) {
     const parseResult = ReviewPullRequestPayloadSchema.safeParse(req.body)
 
     if (!parseResult.success) {
@@ -43,9 +43,9 @@ export class ReviewController {
     }
 
     try {
-      const reviewResponse = await this.reviewService.reviewPullRequest({ pullRequestUrl })
+      const checkAccessResponse = await this.reviewService.checkAccess({ pullRequestUrl })
 
-      res.status(201).json(reviewResponse)
+      res.status(201).json(checkAccessResponse)
     } catch (err: any) {
       res.status(400).json({ error: err.message })
     }

@@ -1,7 +1,7 @@
 import { AuthService } from "./authService";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-interface ReviewPullRequestPayload {
+interface CheckAccessPayload {
   pullRequestUrl: string;
 }
 
@@ -14,7 +14,7 @@ export class ReviewService {
     this.authService = new AuthService()
   }
   
-  public async reviewPullRequest(payload: ReviewPullRequestPayload) {
+  public async checkAccess(payload: CheckAccessPayload) {
     try {
       const pullRequestUrl = payload.pullRequestUrl;
 

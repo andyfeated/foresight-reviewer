@@ -5,6 +5,6 @@ const router = express.Router()
 
 const reviewController: ReviewController = new ReviewController()
 
-router.post('/', reviewController.reviewPullRequest.bind(reviewController))
+router.post('/check-access', reviewController.checkAccess.bind(reviewController))
 
 export default router

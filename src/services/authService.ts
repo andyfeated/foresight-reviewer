@@ -66,22 +66,30 @@ export class AuthService {
     return JSON.parse(decoded)
   }
 
-  public buildPostMessageHtml(token: string, prUrl: string){
+  public buildPostMessageHtml(
+    token?: string | null, prUrl?: string | null, shouldSendMessage: boolean = true
+  ){
+    const script = `
+    window.opener.postMessage({
+      token: "${token}",
+      prUrl: "${prUrl}"
+    }, "http://localhost:4100");
+    `
+    
     const postMessage = `
       <!DOCTYPE html>
 
       <html>
         <body>
           <script>
-            window.opener.postMessage({
-              token: "${token}",
-              prUrl: "${prUrl}"
-            }, "http://localhost:4100");
+            ${shouldSendMessage ? script : ''}
             window.close();
           </script>
         </body>
       </html>
     `
+
+    console.log('here  post message', postMessage)
     
     return postMessage
   }
