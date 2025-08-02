@@ -11,21 +11,29 @@ export class AuthController {
 
   public async gitlabCallbackHandler(req: Request, res: Response) {
     const { code, state } = req.query
-    console.log('code and state', code, state)
 
     try {
       const token = await this.authService.exchangeCodeForToken(code as string)
+
+      const accessToken = token.access_token
+      const expiresIn = token.expires_in
+      
       const decodedState = this.authService.decodeState(state as string)
 
-      const postMessageHtml = this.authService.buildPostMessageHtml(token, decodedState.prUrl)
+      // adds Set-Cookie header to response
+      res.cookie('gitlab_access_token', accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        maxAge: expiresIn * 1000,
+        path: '/'
+      })
 
-      res.status(200).send(postMessageHtml)
+      res.status(200).redirect(`http://localhost:4100/review?prUrl=${encodeURIComponent(decodedState.prUrl)}`)
     } catch(err: any) {
-      const postMessageHtml = this.authService.buildPostMessageHtml(null, null, false)
-
       console.log('Failed to get access token', err.message)
 
-      res.status(400).send(postMessageHtml)
+      res.status(400).redirect('http://localhost:4100/?error=oauth_failed')
     }
   }
 }

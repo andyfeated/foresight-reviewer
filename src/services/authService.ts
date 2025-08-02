@@ -55,7 +55,8 @@ export class AuthService {
       }
 
       const data = await res.json()
-      return data.access_token
+      
+      return data
     } catch (err: any) {      
       throw Error(err.message)
     }
@@ -88,9 +89,7 @@ export class AuthService {
         </body>
       </html>
     `
-
-    console.log('here  post message', postMessage)
-    
+        
     return postMessage
   }
 }
