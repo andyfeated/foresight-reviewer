@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 import reviewRoutes from './routes/reviewRoutes'
 import authRoutes from './routes/authRoutes'
@@ -10,7 +11,11 @@ const app = express()
 dotenv.config()
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: process.env.CLIENT_BASE_URL,
+  credentials: true
+}))
+app.use(cookieParser())
 
 app.get('/health', async (req, res) => {
   res.json({ status: 'API Gateway is running' })
