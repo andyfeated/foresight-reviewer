@@ -3,10 +3,12 @@ import { Request, Response} from 'express'
 import { AuthService } from "../services/authService";
 
 export class AuthController {
-  private authService: AuthService
+  private authService: AuthService;
+  private clientBaseUrl: string;
 
   constructor() {
     this.authService = new AuthService()
+    this.clientBaseUrl = process.env.CLIENT_BASE_URL as string;
   }
 
   public async gitlabCallbackHandler(req: Request, res: Response) {
@@ -29,11 +31,11 @@ export class AuthController {
         path: '/'
       })
 
-      res.status(200).redirect(`http://localhost:4100/review?prUrl=${encodeURIComponent(decodedState.prUrl)}`)
+      res.status(200).redirect(`${this.clientBaseUrl}/review?prUrl=${encodeURIComponent(decodedState.prUrl)}`)
     } catch(err: any) {
       console.log('Failed to get access token', err.message)
 
-      res.status(400).redirect('http://localhost:4100/?error=oauth_failed')
+      res.status(400).redirect(`${this.clientBaseUrl}/?error=oauth_failed`)
     }
   }
 }
