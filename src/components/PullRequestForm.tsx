@@ -30,7 +30,7 @@ const PullRequestForm: React.FC = () => {
     try {
       const checkAccessUrl = `${import.meta.env.VITE_API_GATEWAY_BASE_URL}/api/review/check-access`
       
-      const res = await axios.post(checkAccessUrl, payload)
+      const res = await axios.post(checkAccessUrl, payload, { withCredentials: true })
       
       const data = res.data
 
