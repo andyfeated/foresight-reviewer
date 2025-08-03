@@ -7,11 +7,13 @@ export class AuthService {
   private clientId: string
   private clientSecret: string
   private redirectUrl: string
+  private gitlabServiceBaseUrl: string
 
   constructor() {
     this.clientId = process.env.AUTH_GITLAB_CLIENT_ID as string
     this.clientSecret = process.env.AUTH_GITLAB_CLIENT_SECRET as string
     this.redirectUrl = process.env.AUTH_GITLAB_REDIRECT_URL as string
+    this.gitlabServiceBaseUrl = process.env.GITLAB_SERVICE_URL as string
   }
 
   public buildGitlabOAuthUrl(payload: StatePayload): string {
@@ -91,5 +93,67 @@ export class AuthService {
     `
         
     return postMessage
+  }
+
+  public async getStatus(accessToken: string) {
+    try {
+      if (!accessToken) {
+        return {
+          isLoggedIn: false,
+          data: null
+        }
+      }
+      
+      const gitlabUserResponse = await fetch(`${this.gitlabServiceBaseUrl}/user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'appication/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+
+      if (!gitlabUserResponse.ok) {
+        throw new Error('Failed fetching gitlab user')
+      }
+
+      const data = await gitlabUserResponse.json()
+      
+      return {
+        isLoggedIn: true,
+        id: data.data.id,
+        name: data.data.name,
+        avatar: data.data.avatar_url
+      }
+    } catch (err: any) {
+      throw new Error(err.message)
+    }
+  }
+
+  public async logout(accessToken: string) {
+    try {
+      const body = new URLSearchParams({
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+        token: accessToken
+      })
+
+      const revokeUrl = 'https://gitlab.com/oauth/revoke'
+
+      const res = await fetch(revokeUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body,
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to revoke token')
+      }
+
+      return res
+    } catch (err: any) {
+      throw new Error(err.message)
+    }
   }
 }

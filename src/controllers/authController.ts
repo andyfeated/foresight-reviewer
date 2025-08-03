@@ -38,4 +38,35 @@ export class AuthController {
       res.status(400).redirect(`${this.clientBaseUrl}/?error=oauth_failed`)
     }
   }
+
+  public async getStatus(req: Request, res: Response) {
+    const accessToken = req.gitlabAccessToken as string
+
+    try {
+      const statusData = await this.authService.getStatus(accessToken)
+
+      res.status(200).json(statusData)
+    } catch(err: any) {
+      res.status(400).json({ error: err.message })
+    }
+  }
+
+  public async logout(req: Request, res: Response) {
+    const accessToken = req.gitlabAccessToken as string
+
+    try {
+      await this.authService.logout(accessToken)
+
+      res.clearCookie('gitlab_access_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/'
+      })
+
+      res.status(200).json({ success: true })
+    } catch(err: any) {      
+      res.status(400).json({ error: err.message })
+    }
+  }
 }
