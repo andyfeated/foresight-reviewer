@@ -147,6 +147,8 @@ export class AuthService {
         body,
       })
 
+      console.log(res, 'res')
+
       if (!res.ok) {
         throw new Error('Failed to revoke token')
       }
