@@ -1,0 +1,46 @@
+services:
+  foresight-web:
+    build:
+      context: ../foresight-web
+      dockerfile: Dockerfile.dev
+    container_name: foresight-web-c
+    ports:
+      - 4100:4100
+    env_file:
+      - ../foresight-web/.env
+    volumes:
+      - ../foresight-web:/app
+      - web_node_modules:/app/node_modules
+
+  foresight-api-gateway:
+    build:
+      context: ../foresight-api-gateway
+      dockerfile: Dockerfile.dev
+    container_name: foresight-api-gateway-c
+    ports:
+      - 4000:4000
+    env_file:
+      - ../foresight-api-gateway/.env
+    volumes:
+      - ../foresight-api-gateway:/app
+      - api_gateway_node_modules:/app/node_modules
+    depends_on:
+      - foresight-gitlab-service
+  
+  foresight-gitlab-service:
+    build:
+      context: ../foresight-gitlab-service
+      dockerfile: Dockerfile.dev
+    container_name: foresight-gitlab-service-c
+    ports:
+      - 4001:4001
+    env_file:
+      - ../foresight-gitlab-service/.env
+    volumes:
+      - ../foresight-gitlab-service:/app
+      - gitlab_service_node_modules:/app/node_modules
+
+volumes:
+  web_node_modules: 
+  api_gateway_node_modules:
+  gitlab_service_node_modules:
