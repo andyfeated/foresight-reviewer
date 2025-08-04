@@ -29,6 +29,36 @@ export class ReviewController {
     }
   }
 
+  public async review(req: Request, res: Response) {
+    const parseResult = ReviewPullRequestPayloadSchema.safeParse(req.body)
+
+    if (!parseResult.success) {
+      return res.status(400).json({ error: 'Invalid Input', details: parseResult.error })
+    }
+    
+    const { pullRequestUrl } = req.body
+
+    if (!this.isValidGitlabPRUrl(pullRequestUrl)){
+      return res.status(400).json({ error: 'Invalid Gitlab URL' })
+    }
+
+    try {
+      const accessToken = req.gitlabAccessToken as string
+      
+      const reviewResponse = await this.reviewService.review({ pullRequestUrl }, accessToken)
+      const reviewData = reviewResponse.data
+
+      const data = {
+        id: reviewData.id,
+        title: reviewData.title,
+        description: reviewData.description
+      }
+      res.status(200).json({ success: true, data })
+    } catch (err: any) {
+      res.status(400).json({ error: err.message })
+    }
+  }
+
   public async checkAccess(req: Request, res: Response) {
     const parseResult = ReviewPullRequestPayloadSchema.safeParse(req.body)
 

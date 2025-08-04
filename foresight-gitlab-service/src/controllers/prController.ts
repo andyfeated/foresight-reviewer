@@ -43,7 +43,9 @@ export class PrController {
     }
 
     try {
-      const pullRequestResponse = await this.prService.pullRequest({ pullRequestUrl })
+      const gitlabAccessToken = req.headers['x-gitlab-api-token'] as string
+      
+      const pullRequestResponse = await this.prService.pullRequest({ pullRequestUrl }, gitlabAccessToken)
 
       res.status(201).json(pullRequestResponse)
     } catch (err: any) {
