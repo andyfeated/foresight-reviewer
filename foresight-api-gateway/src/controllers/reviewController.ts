@@ -48,12 +48,7 @@ export class ReviewController {
       const reviewResponse = await this.reviewService.review({ pullRequestUrl }, accessToken)
       const reviewData = reviewResponse.data
 
-      const data = {
-        id: reviewData.id,
-        title: reviewData.title,
-        description: reviewData.description
-      }
-      res.status(200).json({ success: true, data })
+      res.status(200).json({ success: true, data: reviewData })
     } catch (err: any) {
       res.status(400).json({ error: err.message })
     }

@@ -1,9 +1,9 @@
 import { Gitlab, LogOut, SearchCode } from "lucide-react"
 import { useAuth } from "../../context/AuthContext"
-import { useRouter } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 
 const Navbar: React.FC = () => {
-  const { isLoggedIn, user, logout, setAuthStatus } = useAuth()
+  const { isLoggedIn, user, logout } = useAuth()
   const { navigate } = useRouter()
 
   const handleLogout = async () => {
@@ -17,8 +17,10 @@ const Navbar: React.FC = () => {
     <header className="p-6 border-b border-gray-800">
       <div className="flex justify-between">
         <div className="flex items-center">
-          <p className="font-bold text-xl">Foresight Reviewer</p>
-          <SearchCode className="ml-1" />
+          <Link to='/' className="flex">
+            <p className="font-bold text-xl">Foresight Reviewer</p>
+            <SearchCode className="ml-1" />
+          </Link>
         </div>
 
         {isLoggedIn && (

@@ -4,6 +4,7 @@ import axios from "axios"
 
 const Review: React.FC = () => {
   const { prUrl } = useSearch({ from: '/review' })
+  const [data, setData] = useState<any>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -19,7 +20,7 @@ const Review: React.FC = () => {
           { withCredentials: true }
         )
 
-        console.log(reviewResult)
+        setData(reviewResult.data.data)
       } catch(err: any) {
         setError(err.response.data.error)
       }
@@ -28,13 +29,17 @@ const Review: React.FC = () => {
     handleReview()
   }, [])
 
+  if (!error && !data) {
+    return <div>Loading...</div>
+  }
+  
   if (error) {
     return <div>{error}</div>
   }
   
   return (
     <div>
-      Review test
+      <p>{data?.prDetails?.title}</p>
     </div>
   )
 }

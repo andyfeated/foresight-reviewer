@@ -26,6 +26,33 @@ export class PrService {
     const splittedUrl = url.split('/')
     return splittedUrl.pop()
   }
+
+  private async fetchFromGitlab(endpoint: string, accessToken?: string | undefined) {
+    const headers: any = {
+      'Content-Type': 'application/json',
+    }
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
+    }
+
+    const response = await fetch(
+      endpoint,
+      { headers }
+    )
+
+    if (!response.ok && !accessToken?.trim()) {
+      throw new Error('PR is either private or does not exist. Please login via OAuth to continue')
+    }
+
+    if (!response.ok) {
+      throw new Error('PR either does not exist or your account does not have access to it')
+    }
+
+    const data = await response.json()
+
+    return data
+  }
   
   public async pullRequest(payload: PrRequestPayload, accessToken?: string | undefined) {
     try {
@@ -37,31 +64,12 @@ export class PrService {
       const mergeRequestId = this.extractMergeRequestId(pullRequestUrl)
       
       const mergeRequestEndpoint = `${this.gitlabApiBaseUrl}/projects/${encodedProjectId}/merge_requests/${mergeRequestId}`
-      
-      const headers: any = {
-        'Content-Type': 'application/json',
-      }
+      const mergeRequestData = await this.fetchFromGitlab(mergeRequestEndpoint, accessToken)
 
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`
-      }
-      
-      const response = await fetch(
-        mergeRequestEndpoint,
-        { headers }
-      )
+      const changesEndpoint = `${mergeRequestEndpoint}/changes`
+      const changesData = await this.fetchFromGitlab(changesEndpoint, accessToken)
 
-      if (!response.ok && !accessToken?.trim()) {
-        throw new Error('PR is either private or does not exist. Please login via OAuth to continue')
-      }
-
-      if (!response.ok) {
-        throw new Error('PR either does not exist or your account does not have access to it')
-      }
-
-      const data = await response.json()
-      
-      return { status: response.status, data }
+      return { status: 200, data: { prDetails: mergeRequestData, changes: changesData.changes } }
     } catch (err: any) {
       throw new Error(err.message)
     }
