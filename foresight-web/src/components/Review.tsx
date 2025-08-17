@@ -15,7 +15,7 @@ const Review: React.FC = () => {
     const handleReview = async () => {
       try {
         const reviewResult = await axios.post(
-          `${import.meta.env.VITE_API_GATEWAY_BASE_URL}/api/review`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/review`,
           { pullRequestUrl: prUrl },
           { withCredentials: true }
         )
