@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     (async function() {
       const statusRes: any = await axios.get(
-        `${import.meta.env.VITE_API_GATEWAY_BASE_URL}/api/auth/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/status`,
         {
           withCredentials: true
         }
@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_GATEWAY_BASE_URL}/api/auth/logout`, {}, { withCredentials: true }
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout`, {}, { withCredentials: true }
       )
 
       setAuthStatus(false, null)
