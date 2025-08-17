@@ -39,7 +39,7 @@ const Review: React.FC = () => {
   
   return (
     <div>
-      <p>{data?.prDetails?.title}</p>
+      <p>{data?.title}</p>
     </div>
   )
 }

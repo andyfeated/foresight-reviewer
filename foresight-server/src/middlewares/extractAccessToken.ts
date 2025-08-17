@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+ 
 import { Request, Response, NextFunction} from 'express'
 
 declare global {
@@ -9,10 +11,10 @@ declare global {
 }
 
 export default function extractAccessToken(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
+  const accessToken = req.cookies.gitlab_access_token;
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    req.gitlabAccessToken = authHeader.split(' ')[1]
+  if (accessToken?.trim()) {
+    req.gitlabAccessToken = accessToken
   } else {
     req.gitlabAccessToken = undefined
   }

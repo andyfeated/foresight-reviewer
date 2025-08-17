@@ -1,21 +1,23 @@
 {
-  "name": "gitlab-service",
+  "name": "foresight-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn ./src/server.ts"
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
-    "encodeurl": "^2.0.0",
     "express": "^5.1.0",
-    "zod": "^4.0.14"
+    "http-proxy-middleware": "^3.0.5",
+    "zod": "^4.0.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
@@ -24,7 +26,6 @@
     "@types/node": "^24.1.0",
     "eslint": "^9.32.0",
     "globals": "^16.3.0",
-    "jiti": "^2.5.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0"

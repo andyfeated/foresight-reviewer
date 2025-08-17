@@ -50,12 +50,13 @@ export class ReviewService {
     try {
       const pullRequestUrl = payload.pullRequestUrl;
 
+      // need to pass access token here to use it if already logged in
+      // instead of executing oauth again
+
       const pullRequestResponse = await this.gitlabService.getPullRequest(pullRequestUrl)
 
       const pullRequestStatus = pullRequestResponse.status
-     
-      console.log(pullRequestStatus)
-      
+           
       if (pullRequestStatus === 200) {
         return {
           authRequired: false

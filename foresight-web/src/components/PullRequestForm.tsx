@@ -35,7 +35,7 @@ const PullRequestForm: React.FC = () => {
       const data = res.data
 
       if (!data.authRequired) {
-
+        console.log('success')
       } else {
         window.location.href = data.oauthUrl
       }
