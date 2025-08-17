@@ -1,3 +1,5 @@
+import { GitlabService } from "./gitlabService";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface StatePayload {
   prUrl: string;
@@ -7,13 +9,13 @@ export class AuthService {
   private clientId: string
   private clientSecret: string
   private redirectUrl: string
-  private gitlabServiceBaseUrl: string
+  private gitlabService: GitlabService;
 
   constructor() {
     this.clientId = process.env.AUTH_GITLAB_CLIENT_ID as string
     this.clientSecret = process.env.AUTH_GITLAB_CLIENT_SECRET as string
     this.redirectUrl = process.env.AUTH_GITLAB_REDIRECT_URL as string
-    this.gitlabServiceBaseUrl = process.env.GITLAB_SERVICE_URL as string
+    this.gitlabService = new GitlabService()
   }
 
   public buildGitlabOAuthUrl(payload: StatePayload): string {
@@ -69,32 +71,6 @@ export class AuthService {
     return JSON.parse(decoded)
   }
 
-  public buildPostMessageHtml(
-    token?: string | null, prUrl?: string | null, shouldSendMessage: boolean = true
-  ){
-    const script = `
-    window.opener.postMessage({
-      token: "${token}",
-      prUrl: "${prUrl}"
-    }, "http://localhost:4100");
-    `
-    
-    const postMessage = `
-      <!DOCTYPE html>
-
-      <html>
-        <body>
-          <script>
-            ${shouldSendMessage ? script : ''}
-            window.close();
-          </script>
-        </body>
-      </html>
-    `
-        
-    return postMessage
-  }
-
   public async getStatus(accessToken: string) {
     try {
       if (!accessToken) {
@@ -104,14 +80,8 @@ export class AuthService {
         }
       }
       
-      const gitlabUserResponse = await fetch(`${this.gitlabServiceBaseUrl}/user`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'appication/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      })
-
+      const gitlabUserResponse = await this.gitlabService.getUser(accessToken)
+      
       if (!gitlabUserResponse.ok) {
         throw new Error('Failed fetching gitlab user')
       }
@@ -120,9 +90,9 @@ export class AuthService {
       
       return {
         isLoggedIn: true,
-        id: data.data.id,
-        name: data.data.name,
-        avatar: data.data.avatar_url
+        id: data.id,
+        name: data.name,
+        avatar: data.avatar_url
       }
     } catch (err: any) {
       throw new Error(err.message)

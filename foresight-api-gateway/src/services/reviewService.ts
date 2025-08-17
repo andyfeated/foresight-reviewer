@@ -1,4 +1,5 @@
 import { AuthService } from "./authService";
+import { GitlabService } from "./gitlabService";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface ReviewPayload {
@@ -10,35 +11,36 @@ interface CheckAccessPayload {
 }
 
 export class ReviewService {
-  private gitlabServiceBaseUrl: string;
   private authService: AuthService;
+  private gitlabService: GitlabService;
 
   constructor() {
-    this.gitlabServiceBaseUrl = process.env.GITLAB_SERVICE_URL as string;
     this.authService = new AuthService()
+    this.gitlabService = new GitlabService()
   }
 
   public async review(payload: ReviewPayload, accessToken?: string) {
     try {
       const pullRequestUrl = payload.pullRequestUrl
       
-      const pullRequestResponse = await fetch(`${this.gitlabServiceBaseUrl}/pr`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-Gitlab-Api-Token': accessToken ?? ''
-        }, 
-        body: JSON.stringify({ pullRequestUrl })
-      })
+      const pullRequestResponse = await this.gitlabService.getPullRequest(pullRequestUrl, accessToken)
+
+      if (!pullRequestResponse.ok && !accessToken?.trim()) {
+        throw new Error('PR is either private or does not exist. Please login via OAuth to continue')
+      }
+
+      if (!pullRequestResponse.ok) {
+        throw new Error('PR either does not exist or your account does not have access to it')
+      }
 
       if (!pullRequestResponse.ok) {
         const data = await pullRequestResponse.json()
         throw new Error(data.error)
       }
 
-      const data = await pullRequestResponse.json()
+      const pullRequestData = await pullRequestResponse.json()
 
-      return data
+      return pullRequestData
     } catch (err: any) {
       throw new Error(err.message)
     }
@@ -48,19 +50,17 @@ export class ReviewService {
     try {
       const pullRequestUrl = payload.pullRequestUrl;
 
-      const pullRequestResponse = await fetch(`${this.gitlabServiceBaseUrl}/pr`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify({ pullRequestUrl })
-      })
+      const pullRequestResponse = await this.gitlabService.getPullRequest(pullRequestUrl)
 
       const pullRequestStatus = pullRequestResponse.status
      
+      console.log(pullRequestStatus)
+      
       if (pullRequestStatus === 200) {
         return {
           authRequired: false
         }
-      } else if (pullRequestStatus === 400) {
+      } else if (pullRequestStatus === 404) {
         const payload = { prUrl: pullRequestUrl }
 
         const oauthUrl = this.authService.buildGitlabOAuthUrl(payload)

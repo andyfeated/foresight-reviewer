@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrService } from "../services/prService";
 import { Request, Response } from 'express'
 import { z } from 'zod'

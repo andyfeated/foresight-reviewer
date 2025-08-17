@@ -46,7 +46,7 @@ export class ReviewController {
       const accessToken = req.gitlabAccessToken as string
       
       const reviewResponse = await this.reviewService.review({ pullRequestUrl }, accessToken)
-      const reviewData = reviewResponse.data
+      const reviewData = reviewResponse
 
       res.status(200).json({ success: true, data: reviewData })
     } catch (err: any) {
