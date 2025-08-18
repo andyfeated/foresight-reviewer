@@ -1,10 +1,12 @@
-import axios from "axios"
 import { ArrowRightIcon, Github, Gitlab, SearchCode } from "lucide-react"
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from "react"
 
 const PullRequestForm: React.FC = () => {
   const [prUrl, setPrUrl] = useState('')
   const [error, setError] = useState('')
+
+  const navigate = useNavigate()
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,25 +25,10 @@ const PullRequestForm: React.FC = () => {
       return
     }
 
-    const payload = {
-      pullRequestUrl: prUrl
-    }
-
-    try {
-      const checkAccessUrl = `${import.meta.env.VITE_API_BASE_URL}/api/review/check-access`
-      
-      const res = await axios.post(checkAccessUrl, payload, { withCredentials: true })
-      
-      const data = res.data
-
-      if (!data.authRequired) {
-        console.log('success')
-      } else {
-        window.location.href = data.oauthUrl
-      }
-    } catch (err: any) {
-      setError(err.response.data.error)
-    }
+    navigate({ 
+      to: '/review',
+      search: { prUrl: encodeURIComponent(prUrl) } 
+    })
   }
   
   return (

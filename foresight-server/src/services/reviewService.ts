@@ -46,28 +46,35 @@ export class ReviewService {
     }
   }
   
-  public async checkAccess(payload: CheckAccessPayload) {
+  public async checkAccess(payload: CheckAccessPayload, accessToken?: string) {
     try {
       const pullRequestUrl = payload.pullRequestUrl;
 
       // need to pass access token here to use it if already logged in
       // instead of executing oauth again
 
-      const pullRequestResponse = await this.gitlabService.getPullRequest(pullRequestUrl)
+      const pullRequestResponse = await this.gitlabService.getPullRequest(pullRequestUrl, accessToken)
 
       const pullRequestStatus = pullRequestResponse.status
            
       if (pullRequestStatus === 200) {
         return {
-          authRequired: false
+          authRequired: false,
+          hasAccessToPR: true,
         }
-      } else if (pullRequestStatus === 404) {
+      } else if (pullRequestStatus === 404 && accessToken) {
+        return {
+          authRequired: false,
+          hasAccessToPR: false
+        }
+      } else if (pullRequestStatus === 404 && !accessToken) {
         const payload = { prUrl: pullRequestUrl }
 
         const oauthUrl = this.authService.buildGitlabOAuthUrl(payload)
         
         return {
           authRequired: true,
+          hasAccessToPR: false,
           oauthUrl
         }
       } else {

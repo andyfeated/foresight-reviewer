@@ -68,7 +68,8 @@ export class ReviewController {
     }
 
     try {
-      const checkAccessResponse = await this.reviewService.checkAccess({ pullRequestUrl })
+      const accessToken = req.gitlabAccessToken
+      const checkAccessResponse = await this.reviewService.checkAccess({ pullRequestUrl }, accessToken)
 
       res.status(201).json(checkAccessResponse)
     } catch (err: any) {
